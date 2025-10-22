@@ -1,0 +1,32 @@
+const { 
+    Client, 
+    TokenCreateTransaction,
+    TokenType,
+    AccountId,
+    PrivateKey
+} = require("@hashgraph/sdk");
+
+async function createToken() {
+    // Configure client with your testnet account credentials
+    const client = Client.forTestnet();
+    //go to portal.hedera.com/dashboard and set up a testnet account to get:
+    client.setOperator(
+        AccountId.fromString("0.0.6987678"), //Account ID
+        PrivateKey.fromStringECDSA("0x8de625") //"Hex Encoded Private Key"
+    );
+
+    const transaction = new TokenCreateTransaction()
+        .setTokenName("USDCt")
+        .setTokenSymbol("USDCt")
+        .setDecimals(6)
+        .setInitialSupply(75000000000 * 10**6)
+        .setTokenType(TokenType.FungibleCommon)
+        .setTreasuryAccountId(AccountId.fromString("0.0.6987678"));
+
+    const response = await transaction.execute(client);
+    const receipt = await response.getReceipt(client);
+    
+    console.log(`Token ID: ${receipt.tokenId}`);
+}
+
+createToken();
